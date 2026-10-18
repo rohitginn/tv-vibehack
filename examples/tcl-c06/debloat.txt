@@ -1,0 +1,21 @@
+# TCL "Smart TV" (device C06), Android TV 11 (SDK 30), build AR2101, software 6.9.906821247
+# Probed with tools/tv.py --probe on 2026-10-18.
+#
+# Apply:   TV_HOST=<tv ip> tools/disable.sh examples/tcl-c06/debloat.txt
+# Undo:    TV_HOST=<tv ip> tools/restore.sh examples/tcl-c06/debloat.txt
+# Everything is DISABLED, not uninstalled.
+#
+# Deliberately minimal. This firmware has no manufacturer launcher or analytics package to remove;
+# the sponsored rows come from the stock Android TV launcher, which launcher/ replaces. Install the
+# launcher first (launcher/build-and-install.sh), only then disable the stock one, or Home has no target.
+#
+# TCL's own apps that show up as tiles (Live TV com.tcl.tv, com.tcl.waterfall.overseas,
+# com.tcl.dashboard, com.tcl.guard, com.tcl.suspension, com.tcl.t_solo, com.tcl.smartalexa) are only
+# HIDDEN in launcher/app/src/main/res/values/config.xml. They stay installed and enabled until
+# someone has confirmed what each one does and lived without it.
+#
+# Already disabled on the TV before we started: au.com.stan.and, tv.wuaki.apptv.
+# Live TV package for the launcher's Inputs menu on this TV: com.tcl.tv
+
+# Stock Android TV launcher, replaced by launcher/
+com.google.android.tvlauncher

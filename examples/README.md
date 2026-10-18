@@ -6,6 +6,7 @@ on that firmware, grouped and commented. These are starting points: comment out 
 | Folder | TV | OS | Notes |
 |---|---|---|---|
 | `xiaomi-mi-tv-4a/` | Xiaomi Mi TV 4A (MiTV-MOOQ1) | Android TV 10 | PatchWall, Mi analytics, SmartShare, MiLink |
+| `tcl-c06/` | TCL "Smart TV" (C06, AR2101) | Android TV 11 | Minimal: only the stock launcher is disabled; TCL apps are hidden, not disabled |
 
 To add your TV, see [CONTRIBUTING.md](../CONTRIBUTING.md). The quickest way to get a list is to
 run the prompt in [PROMPT.md](../PROMPT.md) and copy the packages your assistant disabled.

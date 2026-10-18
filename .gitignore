@@ -1,5 +1,7 @@
 tools/venv/
+tools/venv-remote/
 tools/adbkey/
+tools/remote-cert/
 tools/__pycache__/
 launcher/.gradle/
 launcher/build/

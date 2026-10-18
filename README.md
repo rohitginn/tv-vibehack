@@ -33,6 +33,7 @@ step with screenshots from the TV. If you'd rather do it by hand, the pieces are
 | [`tools/tv.py`](tools/tv.py) | Pure-Python ADB client (shell, batch, push, pull). Works where the stock `adb` is blocked. |
 | [`tools/b64push.py`](tools/b64push.py) | Uploads larger files (APKs) as base64 chunks with an md5 check. |
 | [`tools/disable.sh`](tools/disable.sh), [`tools/restore.sh`](tools/restore.sh) | Apply or undo a debloat list. |
+| [`tools/remote.py`](tools/remote.py) | Android TV Remote over Wi-Fi: use the Mac as the TV's remote. No ADB needed. |
 | [`examples/`](examples/) | Per-TV debloat lists. Add yours, see [CONTRIBUTING.md](CONTRIBUTING.md). |
 
 ## The launcher
@@ -73,6 +74,22 @@ tools/disable.sh examples/xiaomi-mi-tv-4a/debloat.txt        # apply a list
 tools/restore.sh examples/xiaomi-mi-tv-4a/debloat.txt        # undo it, restore stock launcher
 ```
 
+### Using the Mac as the TV's remote
+
+`tools/remote.py` speaks the protocol behind the Google TV phone remote, so it works without ADB or
+Developer options. It sends keys, launches apps and types text; it cannot install or disable apps.
+It needs Python 3.11+, so it has its own venv:
+
+```bash
+python3.11 -m venv tools/venv-remote && tools/venv-remote/bin/pip install -r tools/requirements-remote.txt
+export TV_HOST=192.168.1.50
+R="tools/venv-remote/bin/python -I tools/remote.py"
+$R discover                 # find TVs on the network (or read the IP from the TV's network settings)
+$R pair                     # once: type the code the TV shows
+$R key home                 # or: key up up ok back, app com.netflix.ninja, text "hello"
+$R live                     # arrow keys, Enter, Backspace, h, + / - on the Mac keyboard
+```
+
 ### Gotchas we hit
 
 - **macOS: `adb connect` says "No route to host"** while the port is clearly open. Recent macOS
@@ -89,6 +106,19 @@ tools/restore.sh examples/xiaomi-mi-tv-4a/debloat.txt        # undo it, restore 
 - **No on-screen keyboard** after switching launchers (seen on Xiaomi): the default input method
   pointed at a Baidu IME that isn't installed. Fix with
   `tools/tv.py 'ime set com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME'`.
+- **Play Protect blocks the install** ("Unsafe app blocked: built for an older version of Android",
+  seen on a TCL C06). The launcher therefore targets API 34 and declares `<queries>` so it can still
+  see other apps. Don't turn the verifier off to get around it. The dialog sits on the TV until you
+  choose "Got it", and the `pm install` waits behind it.
+- **`screencap` fails** on some TVs (TCL C06: exit 1, empty file). Read the screen as text instead:
+  `tools/tv.py 'uiautomator dump /sdcard/ui.xml; cat /sdcard/ui.xml'` (text, focus, bounds) and
+  `tools/tv.py 'dumpsys window | grep mCurrentFocus'` for the foreground app.
+- **ADB handshake hangs** on some TVs while an on-screen dialog is open, or after several quick
+  connections in a row. Keep to one `--batch` connection and look at the TV for a prompt.
+- **The Wi-Fi pill says "Wi-Fi" instead of the network name** when the TV's Location setting is off:
+  Android 10+ only reveals the SSID with location services on.
+- **`cmd package set-home-activity` alone is not enough.** The stock launcher still wins the Home
+  button until it is disabled (`pm disable-user`).
 
 ## Supported TVs
 
